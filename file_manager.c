@@ -4,12 +4,20 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <stdlib.h>
 
 #define MAX_BUF_SIZE 1024
 #define NAMED_PIPE "named_pipe"
 #define RESPONSE_NAMED_PIPE "response_named_pipe"
 
 pthread_mutex_t lock;
+void process_create_command(int fd_response, char* file_name);
+void process_write_command(int fd_response, char* file_name, char* data);
+void process_delete_command(int fd_response, char* file_name);
+void process_read_command(int fd_response, char* file_name);
+void process_exit_command(int fd_response);
+void* listen_thread(void* arg);
+
 
 void process_create_command(int fd_response, char* file_name) {
   // Olası diger clientlerinde erisememesi icin mutex kilitlenir
@@ -96,7 +104,7 @@ void process_read_command(int fd_response, char* file_name) {
     write(fd_response, response, strlen(response));
   } else {
     // dosya bulunamazsa, file_clienta asagidaki responsu dondurur.
-    write(fd_response, "Okunmak Istenen Dosya Bulunamadi\n", 35);
+    write(fd_response, "Okunmak Istenen Dosya Bulunamadi\n", 34);
   }
 
   // mutex acilir
